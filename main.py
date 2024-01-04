@@ -8,7 +8,12 @@ from aiogram.filters.command import Command
 
 import config
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    filename="logfile.log",
+    filemode="w",
+    format="%(asctime)s %(levelname)s %(message)s",
+)
 client = OpenAI(api_key=config.OPENAI_KEY)
 
 bot = Bot(token=config.TOKEN)
@@ -29,6 +34,8 @@ async def cmd_help(message: types.Message):
 
 @dp.message(F.from_user.id.in_(allowed_users))
 async def chatgpt(message: types.Message):
+    logging.info(f'{message.from_user.id}({message.from_user.username}) use ChatGPT')
+
     try:
         path = f'chatgpt_history/{message.chat.id}.json'
 
@@ -67,6 +74,8 @@ async def chatgpt(message: types.Message):
 
 
 async def main():
+    print(f'Path to log: {os.getcwd()}/logfile.log')
+    print('Start polling...')
     await dp.start_polling(bot)
 
 
