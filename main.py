@@ -42,8 +42,8 @@ async def chatgpt(message: types.Message):
         if os.path.exists(path):
             with open(path, 'r', encoding='UTF-8') as file:
                 messages = json.load(file)
-            if len(messages) > 100:
-                messages = messages[-100:]
+            if len(messages) > 20:
+                messages = messages[-20:]
         else:
             messages = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
 
