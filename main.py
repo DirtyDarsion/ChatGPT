@@ -23,6 +23,20 @@ dp = Dispatcher()
 allowed_users = [config.ADMIN]
 
 
+'''
+Для анимированного сообщения ожидания
+
+async def loading_message(loading, msg):
+    count = 0
+    while loading:
+        time.sleep(0.5)
+        count += 1
+        if count == 4:
+            count = 1
+        await msg.edit_text(f'Ожидайте{"." * count}')
+'''
+
+
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     await message.answer("Привет! Данный бот позволяет общаться с ChatGPT. Напиши любое сообщение.")
@@ -36,11 +50,20 @@ async def cmd_help(message: types.Message):
 @dp.message(F.from_user.id.in_(allowed_users))
 async def chatgpt(message: types.Message):
     logging.info(f'{message.from_user.id}({message.from_user.username}) use ChatGPT')
+    msg = await message.reply("Ожидайте...", parse_mode='Markdown')
 
-    answer = await message.reply("Ожидайте ...", parse_mode='Markdown')
-    time.sleep(100)
-    await answer.edit_text('Ожидайте .')
+    '''
+    Для анимированного сообщения ожидания
+    
+    loading = True
 
+    await loading_message(loading, msg)
+
+    time.sleep(3)
+
+    loading = False
+    print('Stopped')
+    '''
     try:
         path = f'chatgpt_history/{message.chat.id}.json'
 
@@ -68,14 +91,13 @@ async def chatgpt(message: types.Message):
         with open(path, 'w', encoding='UTF-8') as file:
             json.dump(messages, file, ensure_ascii=False)
 
-        await message.reply(completion.choices[0].message.content, parse_mode='Markdown')
+        await msg.edit_text(completion.choices[0].message.content, parse_mode='Markdown')
     except RateLimitError:
-        await message.reply(f"Ошибка {str(RateLimitError.status_code)}, обратитесь за помощью к администратору.",
+        await msg.edit_text(f"Ошибка {str(RateLimitError.status_code)}, обратитесь за помощью к администратору.",
                             parse_mode='Markdown')
         logging.warning(RateLimitError)
     except Exception:
-        await message.reply(f"Ошибка, обратитесь за помощью к администратору.",
-                            parse_mode='Markdown')
+        await msg.edit_text(f"Ошибка, обратитесь за помощью к администратору.")
         logging.warning(Exception)
 
 
