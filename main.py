@@ -1,35 +1,12 @@
 import os
 import json
 import asyncio
-import logging
 from openai import OpenAI, RateLimitError
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters.command import Command
 
-# Импортируем ключи
 import config
-
-# Создаем объект логгера
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# Создаем форматтер
-formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-
-# Создаем обработчик для вывода в файл
-file_handler = logging.FileHandler("logfile.log", mode='w')
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(formatter)
-
-# Создаем обработчик для вывода в консоль
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
-console_handler.setFormatter(formatter)
-
-# Добавляем обработчики к логгеру
-logger.addHandler(file_handler)
-logger.addHandler(console_handler)
-
+from settings import logger
 
 client = OpenAI(api_key=config.OPENAI_KEY)
 
@@ -38,19 +15,6 @@ dp = Dispatcher()
 
 # Список пользователей, чьи запросы будут уходить на сервера OpenAI
 allowed_users = [config.ADMIN]
-
-'''
-Для анимированного сообщения ожидания
-
-async def loading_message(loading, msg):
-    count = 0
-    while loading:
-        time.sleep(0.5)
-        count += 1
-        if count == 4:
-            count = 1
-        await msg.edit_text(f'Ожидайте{"." * count}')
-'''
 
 
 @dp.message(Command("start"))
@@ -81,21 +45,9 @@ async def cmd_help(message: types.Message):
 async def chatgpt(message: types.Message):
     logger.info(f'{message.from_user.id}({message.from_user.username}) use ChatGPT. Text: "{message.text}"')
 
-    # Сообщение, которое будет в чате, пока ожидается ответ от серверов OpenAI
+    # Сообщение будет редактироваться когда получит ответ от серверов OpenAI
     msg = await message.reply("Ожидайте...", parse_mode='Markdown')
-
-    '''
-    Для анимированного сообщения ожидания
     
-    loading = True
-
-    await loading_message(loading, msg)
-
-    time.sleep(3)
-
-    loading = False
-    print('Stopped')
-    '''
     try:
         # История переписки с пользователем хранится в файле path:
         path = f'chatgpt_history/{message.chat.id}.json'
