@@ -1,0 +1,3 @@
+TOKEN = "Your Telegram Bot TOKEN"
+OPENAI_KEY = "Your OpenAI API Key"
+ADMIN = Your user_id in Telegram (Must be integer)
