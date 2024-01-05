@@ -65,7 +65,13 @@ async def chatgpt(message: types.Message):
 
         await message.reply(completion.choices[0].message.content, parse_mode='Markdown')
     except RateLimitError:
-        print(f"Ошибка {str(RateLimitError.status_code)}, обратитесь за помощью к администратору.")
+        await message.reply(f"Ошибка {str(RateLimitError.status_code)}, обратитесь за помощью к администратору.",
+                            parse_mode='Markdown')
+        logging.warning(RateLimitError)
+    except Exception:
+        await message.reply(f"Ошибка, обратитесь за помощью к администратору.",
+                            parse_mode='Markdown')
+        logging.warning(Exception)
 
 
 @dp.message()
