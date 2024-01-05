@@ -2,6 +2,7 @@ import os
 import json
 import asyncio
 import logging
+import time
 from openai import OpenAI, RateLimitError
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters.command import Command
@@ -35,6 +36,10 @@ async def cmd_help(message: types.Message):
 @dp.message(F.from_user.id.in_(allowed_users))
 async def chatgpt(message: types.Message):
     logging.info(f'{message.from_user.id}({message.from_user.username}) use ChatGPT')
+
+    answer = await message.reply("Ожидайте ...", parse_mode='Markdown')
+    time.sleep(100)
+    await answer.edit_text('Ожидайте .')
 
     try:
         path = f'chatgpt_history/{message.chat.id}.json'
