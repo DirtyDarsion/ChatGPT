@@ -29,7 +29,8 @@ async def cmd_start(message: types.Message):
             'username': message.from_user.username,
             'firstname': message.from_user.first_name
         })
-    print(users)
+    with open('chatgpt_history/users.json', 'w', encoding='UTF-8') as file:
+        json.dump(users, file, ensure_ascii=False)
 
 
 # Обработка команды help
