@@ -17,11 +17,22 @@ dp = Dispatcher()
 allowed_users = [config.ADMIN]
 
 
+# Обработка команды start
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     await message.answer("Привет! Данный бот позволяет использовать ChatGPT. Напиши любое сообщение.")
+    with open('chatgpt_history/users.json', 'r', encoding='UTF-8') as file:
+        users = json.load(file)
+    if str(message.from_user.id) not in map(lambda x: x['id'], users):
+        users.append({
+            'id': message.from_user.id,
+            'username': message.from_user.username,
+            'firstname': message.from_user.first_name
+        })
+    print(users)
 
 
+# Обработка команды help
 @dp.message(Command("help"))
 async def cmd_help(message: types.Message):
     await message.answer("Бот транслирует сообщения в облачный сервис OpenAI API, "
@@ -36,7 +47,7 @@ async def cmd_help(message: types.Message):
         text = log.readlines()
         answer = text[-30:]
         message_text = ''.join(answer)
-        # message_text += f'\nВсего строк в логе: <b>{len(text)}</b>'
+        message_text += f'\nВсего строк в логе: **{len(text)}**'
         await message.reply(message_text, parse_mode='Markdown')
 
 
