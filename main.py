@@ -14,7 +14,7 @@ bot = Bot(token=config.TOKEN)
 dp = Dispatcher()
 
 # Список пользователей, чьи запросы будут уходить на сервера OpenAI
-allowed_users = [config.ADMIN]
+allowed_users = [config.ADMIN] + config.USERS
 
 
 # Обработка команды start
