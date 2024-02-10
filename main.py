@@ -52,6 +52,16 @@ async def cmd_help(message: types.Message):
         await message.reply(message_text, parse_mode='Markdown')
 
 
+@dp.message(Command("logfix"), F.from_user.id == config.ADMIN)
+async def cmd_help(message: types.Message):
+    with open('logfile.log', 'r') as log:
+        text = log.readlines()
+        answer = text[-30:]
+        message_text = ''.join(answer)
+        message_text += f'\nВсего строк в логе: {len(text)}'
+        await message.reply(message_text)
+
+
 # Отправка на API остальные запросы допущенных пользователей
 @dp.message(F.from_user.id.in_(allowed_users))
 async def chatgpt(message: types.Message):
@@ -79,6 +89,8 @@ async def chatgpt(message: types.Message):
             model="gpt-3.5-turbo",
             messages=messages,
         )
+
+        logger.warning(completion)
 
         # Сохранение в историю переписки ответ бота и запись в файл
         messages.append(
