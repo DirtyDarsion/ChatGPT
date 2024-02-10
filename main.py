@@ -45,7 +45,7 @@ async def cmd_help(message: types.Message):
 # Отправить последние 30 строк из файла logfile.txt. Команда доступна только админу бота.
 @dp.message(Command("log"), F.from_user.id == config.ADMIN)
 async def cmd_help(message: types.Message):
-    logger.info(f'{message.from_user.username} send log')
+    logger.info(f'{message.from_user.username} get log')
     try:
         with open('logfile.log', 'r') as log:
             text = log.readlines()
@@ -60,7 +60,7 @@ async def cmd_help(message: types.Message):
 
 @dp.message(Command("logfix"), F.from_user.id == config.ADMIN)
 async def cmd_help(message: types.Message):
-    logger.info(f'{message.from_user.username} send log')
+    logger.info(f'{message.from_user.username} get log')
     try:
         with open('logfile.log', 'r') as log:
             text = log.readlines()
@@ -71,7 +71,6 @@ async def cmd_help(message: types.Message):
     except Exception:
         logger.error('Ошибка:', traceback.format_exc())
         await message.reply(f"Ошибка.", parse_mode='Markdown')
-
 
 
 # Отправка на API остальные запросы допущенных пользователей
