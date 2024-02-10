@@ -71,6 +71,7 @@ async def chatgpt(message: types.Message):
     msg = await message.reply("Ожидайте...", parse_mode='Markdown')
     
     try:
+        logger.info('step1')
         # История переписки с пользователем хранится в файле path:
         path = f'chatgpt_history/{message.chat.id}.json'
 
@@ -82,7 +83,7 @@ async def chatgpt(message: types.Message):
                 messages = messages[-20:]
         else:
             messages = [{'role': 'system', 'content': 'You are a funny assistant.'}]
-
+        logger.info('step2')
         # Добавление в историю переписки последнего сообщения пользователя и отправка в API
         messages.append({'role': 'user', 'content': message.text})
         completion = client.chat.completions.create(
@@ -114,6 +115,11 @@ async def chatgpt(message: types.Message):
         logger.error(RateLimitError)
         await msg.edit_text(f"Ошибка {str(RateLimitError.status_code)}, обратитесь за помощью к администратору.",
                             parse_mode='Markdown')
+    except Exception:
+        logger.error('Exception')
+        logger.error(Exception)
+    except:
+        logger.error('Error not exception')
 
 
 @dp.message()
