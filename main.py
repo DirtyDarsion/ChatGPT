@@ -45,22 +45,33 @@ async def cmd_help(message: types.Message):
 # Отправить последние 30 строк из файла logfile.txt. Команда доступна только админу бота.
 @dp.message(Command("log"), F.from_user.id == config.ADMIN)
 async def cmd_help(message: types.Message):
-    with open('logfile.log', 'r') as log:
-        text = log.readlines()
-        answer = text[-30:]
-        message_text = ''.join(answer)
-        message_text += f'\nВсего строк в логе: **{len(text)}**'
-        await message.reply(message_text, parse_mode='Markdown')
+    logger.info(f'{message.from_user.username} send log')
+    try:
+        with open('logfile.log', 'r') as log:
+            text = log.readlines()
+            answer = text[-30:]
+            message_text = ''.join(answer)
+            message_text += f'\nВсего строк в логе: **{len(text)}**'
+            await message.reply(message_text, parse_mode='Markdown')
+    except Exception:
+        logger.error('Ошибка:', traceback.format_exc())
+        await message.reply(f"Ошибка.", parse_mode='Markdown')
 
 
 @dp.message(Command("logfix"), F.from_user.id == config.ADMIN)
 async def cmd_help(message: types.Message):
-    with open('logfile.log', 'r') as log:
-        text = log.readlines()
-        answer = text[-30:]
-        message_text = ''.join(answer)
-        message_text += f'\nВсего строк в логе: {len(text)}'
-        await message.reply(message_text)
+    logger.info(f'{message.from_user.username} send log')
+    try:
+        with open('logfile.log', 'r') as log:
+            text = log.readlines()
+            answer = text[-30:]
+            message_text = ''.join(answer)
+            message_text += f'\nВсего строк в логе: {len(text)}'
+            await message.reply(message_text)
+    except Exception:
+        logger.error('Ошибка:', traceback.format_exc())
+        await message.reply(f"Ошибка.", parse_mode='Markdown')
+
 
 
 # Отправка на API остальные запросы допущенных пользователей
@@ -72,7 +83,6 @@ async def chatgpt(message: types.Message):
     msg = await message.reply("Ожидайте...", parse_mode='Markdown')
     
     try:
-        logger.info('step1')
         # История переписки с пользователем хранится в файле path:
         path = f'chatgpt_history/{message.chat.id}.json'
 
@@ -84,7 +94,6 @@ async def chatgpt(message: types.Message):
                 messages = messages[-20:]
         else:
             messages = [{'role': 'system', 'content': 'You are a funny assistant.'}]
-        logger.info('step2')
         # Добавление в историю переписки последнего сообщения пользователя и отправка в API
         messages.append({'role': 'user', 'content': message.text})
         completion = client.chat.completions.create(
