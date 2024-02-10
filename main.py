@@ -1,7 +1,7 @@
 import os
 import json
 import asyncio
-from openai import OpenAI, RateLimitError
+from openai import OpenAI, RateLimitError, PermissionDeniedError
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters.command import Command
 
@@ -90,7 +90,7 @@ async def chatgpt(message: types.Message):
             messages=messages,
         )
 
-        logger.warning(completion)
+        logger.info(completion)
 
         # Сохранение в историю переписки ответ бота и запись в файл
         messages.append(
@@ -104,6 +104,11 @@ async def chatgpt(message: types.Message):
 
         # Отправка ответа ChatGPT в чат
         await msg.edit_text(completion.choices[0].message.content, parse_mode='Markdown')
+    # Обработка ошибка 403 об ограничении доступа
+    except PermissionDeniedError:
+        logger.error(PermissionDeniedError)
+        await msg.edit_text(f"Ошибка {str(PermissionDeniedError.status_code)}, обратитесь за помощью к администратору.",
+                            parse_mode='Markdown')
     # Обработка ошибки 429 о превышении лимитов или окончании бесплатного срока API ключа
     except RateLimitError:
         logger.error(RateLimitError)
