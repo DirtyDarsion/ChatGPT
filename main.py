@@ -1,6 +1,7 @@
 import os
 import json
 import asyncio
+import  traceback
 from openai import OpenAI, RateLimitError, PermissionDeniedError
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters.command import Command
@@ -107,19 +108,17 @@ async def chatgpt(message: types.Message):
         await msg.edit_text(completion.choices[0].message.content, parse_mode='Markdown')
     # Обработка ошибка 403 об ограничении доступа
     except PermissionDeniedError:
-        logger.error(PermissionDeniedError)
+        logger.error('Ошибка:', traceback.format_exc())
         await msg.edit_text(f"Ошибка {str(PermissionDeniedError.status_code)}, обратитесь за помощью к администратору.",
                             parse_mode='Markdown')
     # Обработка ошибки 429 о превышении лимитов или окончании бесплатного срока API ключа
     except RateLimitError:
-        logger.error(RateLimitError)
+        logger.error('Ошибка:', traceback.format_exc())
         await msg.edit_text(f"Ошибка {str(RateLimitError.status_code)}, обратитесь за помощью к администратору.",
                             parse_mode='Markdown')
     except Exception:
-        logger.error('Exception')
-        logger.error(Exception)
-    except:
-        logger.error('Error not exception')
+        logger.error('Ошибка:', traceback.format_exc())
+        await msg.edit_text(f"Ошибка.", parse_mode='Markdown')
 
 
 @dp.message()
